@@ -30,7 +30,7 @@
 				
 				console.log(i,name);
 		
-				$.getJSON('data.php', {channel: i, name: name.toLowerCase()},	function(data) {
+				$.getJSON('jdata.php', {channel: i, name: name.toLowerCase()},	function(data) {
 		
 					seriesOptions[i] = {
 						name: name,
