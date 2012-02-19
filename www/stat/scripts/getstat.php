@@ -31,12 +31,15 @@
         
         //echo 'con';
         //echo 'con';
-        try {                   
+        try {
+        
+        	//for mysql                   
             $sql = $db->prepare("INSERT INTO nfem_stat.`minute-stat`(date, channel, users) VALUES (:date,:channel,:users)");  
             $sql->bindParam(':channel',$ch);  
             $sql->bindParam(':users',$us);  
             $sql->bindParam(':date',$date);
             
+            //for postgres
             $sql_pg = $db_pg->prepare("INSERT INTO cc_stat_intervals (date, channel, users) VALUES (:date,:channel,:users)");
             $sql_pg->bindParam(':channel',$ch);
             $sql_pg->bindParam(':users',$us);
@@ -55,21 +58,6 @@
                 //var_dump($sql, $ch, $us);
                 //var_dump($sql_pg);
             }
-            /*
-            //AVG
-            $sql = $db->prepare("SELECT CAST(AVG(sub.total) AS UNSIGNED) total_average FROM (SELECT SUM(m.users) total, DATE_FORMAT(m.date, '%k:%i') label FROM `minute-stat` m WHERE m.date >  DATE_SUB(NOW(), INTERVAL 24 HOUR) GROUP BY m.date) sub");
-            $sql->execute();
-            $result = $sql->fetchAll(PDO::FETCH_ASSOC);
-            //var_dump($result);
-            file_put_contents($basePath.'total-avg.dat', $result[0]['total_average']);
-            
-            //MAX
-            $sql = $db->prepare("SELECT CAST(MAX(sub.total) AS UNSIGNED) total_max FROM (SELECT SUM(m.users) total, DATE_FORMAT(m.date, '%k:%i') label FROM `minute-stat` m WHERE m.date >  DATE_SUB(NOW(), INTERVAL 24 HOUR) GROUP BY m.date) sub");
-            $sql->execute();
-            $result = $sql->fetchAll(PDO::FETCH_ASSOC);
-            //var_dump($result);
-            file_put_contents($basePath.'total-max.dat', $result[0]['total_max']);
-            */
         }  
         catch(PDOException $e) {  
             //$db->rollBack();  
