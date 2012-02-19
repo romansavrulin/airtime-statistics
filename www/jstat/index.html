@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+
+  <!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame 
+       Remove this if you use the .htaccess -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+  <title>templates</title>
+  <meta name="description" content="" />
+  <meta name="author" content="Romeo" />
+
+  <meta name="viewport" content="width=device-width; initial-scale=1.0" />
+
+  <!-- Replace favicon.ico & apple-touch-icon.png in the root of your domain and delete these references -->
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+		<script type="text/javascript">
+		$(function() {
+			var seriesOptions = [],
+				yAxisOptions = [],
+				seriesCounter = 0,
+				names = ['MSFT'],//, 'AAPL', 'GOOG'],
+				colors = Highcharts.getOptions().colors;
+				console.log('hello world!');
+			$.each(names, function(i, name) {
+				
+				console.log(i,name);
+		
+				$.getJSON('data.php', {channel: i, name: name.toLowerCase()},	function(data) {
+		
+					seriesOptions[i] = {
+						name: name,
+						data: data,
+						type : 'areaspline',
+						/*fillColor : {
+							linearGradient : {
+								x1: 0, 
+								y1: 0, 
+								x2: 0, 
+								y2: 1
+							},
+							stops : [[0, Highcharts.getOptions().colors[0]], [1, 'rgba(0,0,0,0)']]
+						}*/
+					};
+					console.log(data);
+		
+					// As we're loading the data asynchronously, we don't know what order it will arrive. So
+					// we keep a counter and create the chart when all the data is loaded.
+					seriesCounter++;
+		
+					if (seriesCounter == names.length) {
+						createChart();
+					}
+				});
+			});
+		
+		
+		
+			// create the chart when all data is loaded
+			function createChart() {
+		
+				chart = new Highcharts.StockChart({
+				    chart: {
+				        renderTo: 'container',
+				        events: {
+				        	
+				        	load: function(e){
+						    	//alert("load");
+						    	var extremes = this.xAxis[0].getExtremes()
+						    	//console.log(extremes);
+						    	$('#report').html('<b>Set extremes:</b> '+ Highcharts.dateFormat(null, extremes.min) +
+			                        ', '+ Highcharts.dateFormat(null, extremes.max));
+						    	
+						    },
+				    		/*selection: function(e){
+				    			alert("selection");
+				    		}*/
+				        }
+				    },
+		
+				    rangeSelector: {
+				        selected: 0
+				    },
+		
+				    yAxis: {
+				    	labels: {
+				    		formatter: function() {
+				    			return Math.round(this.value);
+				    		}
+				    	},
+				    	plotLines: [{
+				    		value: 0,
+				    		width: 2,
+				    		color: 'silver'
+				    	}]
+				    },
+				    
+				    /*plotOptions: {
+				    	series: {
+				    		compare: 'percent'
+				    	}
+				    },*/
+				    
+				    tooltip: {
+				    	pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b><br/>',
+				    	yDecimals: 0
+				    },
+				    
+				    xAxis: {
+			            events: {
+			                setExtremes: function(e) {
+			                    $('#report').html('<b>Set extremes:</b> '+ Highcharts.dateFormat(null, e.min) +
+			                        ', '+ Highcharts.dateFormat(null, e.max));
+			                }/*,
+			                afterSetExtremes: function  (e) {
+							  alert('after');
+							}*/
+			            }
+			        },
+				    
+				    series: seriesOptions,
+				});
+				
+				//chart.xAxis.on("setExtremes", function(e){alert(e.max)});
+			}
+			
+			
+		
+		});
+		</script>
+</head>
+
+<body>
+	<script type="text/javascript" src="../Highstock-1.0.2/js/highstock.js"></script>
+  <div>
+    <header>
+      <h1>Channel Statistics</h1>
+    </header>
+      <div id="container" style="height: 400px; min-width: 600px"></div>
+      <div id="report" style="font: 0.8em sans-serif"></div>
+    <footer>
+     <p>&copy; Copyright  by <a href="http://vk.com/deepmind">Romeo</a></p>
+    </footer>
+  </div>
+</body>
+</html>
